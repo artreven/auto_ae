@@ -5,8 +5,6 @@ Created on Jun 7, 2013
 
 @author: artreven
 '''
-from nose.tools import assert_raises, nottest
-
 import os
 import shutil
 import itertools
@@ -37,7 +35,7 @@ def prover(imp):
            for num_seq in powerset(imp.premise)):
         return True
     else:
-        return False 
+        return False
 
 class Test:
     def setUp(self):

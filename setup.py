@@ -4,12 +4,12 @@ use_setuptools()
 
 from setuptools import setup
 
-setup(name             = "AutoAE",
+setup(name             = "auto_ae",
       version          = "0.0.1",
       author           = ["Artem Revenko"],
       author_email     = ["artreven@gmail.com"],
-      description      = "Python package for doing attribute exploration automatically",
-      keywords         = ["Computer Science", "Artificial Intelligence",
-                          "Formal Concept Analysis", "Implications", "Concept Lattice",
+      description      = "Python package for attribute exploration",
+      keywords         = ["Artificial Intelligence", "Formal Concept Analysis",
+                          "Implications", "Concept Lattice",
                           "Computational Logic"]
 )
