@@ -55,14 +55,15 @@ class AE(object):
         @param go_on: see *advance* method.
         @param attributes_changing: determines if new attribute should be added.
         @ivar step: current step of AE
-        '''        
+        '''
+        self.dest = _check_dest(dest)
+        open(dest + '/progress.log', 'w').close()
         logging.basicConfig(filename=dest + '/progress.log',
                             filemode='w',
                             format='%(levelname)s %(asctime)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
         self.logger = logging.getLogger(__name__)
         self.cxt = cxt
-        self.dest = _check_dest(dest)
         self.go_on = go_on
         self.ce_finder = ce_finder # usage *ce_finder(implication, wait)* => (ce, imp)
         self.has_attribute = has_attribute
@@ -136,8 +137,7 @@ class AE(object):
         
         It is not necessary that during the run of this functions new
         entities are found. For example, *go_on* could try to prove
-        the implications. In this case output of *go_on* should be an empty
-        iterable.
+        the implications. In this case output of *go_on* should be ([], []).
         
         @param wait: time limit for *go_on* function.
         """
@@ -209,12 +209,12 @@ class AE(object):
                 m += '\nTime taken:{0}\n\n'.format(te_ce - ts_ce)
                 f.write(m)
             if ce:
-                self.add_object(str(ce))
+                self.add_object(repr(ce))
                 self.reduce_objects()
                 if self.attributes_growing:
                     new_attribute = self.get_new_attribute(ce)
                     if new_attribute:
-                        self.add_attribute(str(new_attribute))
+                        self.add_attribute(repr(new_attribute))
                         self.reduce_attributes()
                 self.step += 1
                 break
