@@ -62,7 +62,7 @@ class AE(object):
                             filemode='w',
                             format='%(levelname)s %(asctime)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
-        self.logger = logging.getLogger(__name__)
+#         self.logger = logging.getLogger(__name__)
         self.cxt = cxt
         self.go_on = go_on
         self.ce_finder = ce_finder # usage *ce_finder(implication, wait)* => (ce, imp)
@@ -84,7 +84,7 @@ class AE(object):
         basis = self.cxt.get_attribute_canonical_basis()
         te = time.time()
         m = '\nIt took {0} seconds to compute the canonical basis.\n'.format(te-ts)
-        self.logger.info(m)
+        logging.info(m)
         self._basis = basis
         return basis
 
@@ -143,7 +143,7 @@ class AE(object):
         """
         if self.go_on == None:
             m = '\nDo not know how to continue.'
-            self.logger.info(m)
+            logging.info(m)
             return ([], [])
         ts = time.time()
         (new_objects, new_attributes) = self.go_on(self, wait)
@@ -166,7 +166,7 @@ class AE(object):
             self.reduce_attributes()
             m += '{0} new attributes found: {1}\n'.format(len(new_attributes), new_attributes)
             m += '{0} attributes left after reducing.\n'.format(len(self.cxt.attributes))
-        self.logger.info(m)
+        logging.info(m)
         return new_objects, new_attributes
     
     def find_ces(self, imps, wait=float('inf')):
@@ -233,7 +233,7 @@ class AE(object):
                 m += '{0} attributes left after reducing.\n'.format(len(self.cxt.attributes))
         else:
             m += 'No counter-examples found.\n'
-        self.logger.info(m)
+        logging.info(m)
         return ce, imp
     
     def run(self, ce_wait, go_on_wait=float('inf')):
@@ -255,7 +255,7 @@ class AE(object):
             if self.attributes_growing:
                 m += 'There were {0} '.format(len(self.cxt.attributes))
                 m += 'attributes before the start of this step\n'
-            self.logger.info(m)
+            logging.info(m)
             basis = self.basis
             (ce, imp_ce) = self.find_ces(basis, ce_wait)
             if not ce:
