@@ -57,7 +57,7 @@ class AE(object):
         @ivar step: current step of AE
         '''
         self.dest = _check_dest(dest)
-        open(dest + '/progress.log', 'w').close()
+        open(dest + '/progress.log', 'a').close()
         logging.basicConfig(filename=dest + '/progress.log',
                             filemode='w',
                             format='%(levelname)s %(asctime)s: %(message)s',
