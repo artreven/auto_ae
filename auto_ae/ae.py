@@ -266,14 +266,12 @@ class AE(object):
 ###############################################################################
 def _check_dest(dest):
     """
-    Check if directory does not exist. If it does raise an Error, if it does not
-    create it and return *dest*
+    Check if directory does not exist. if it does not exist create it and return
+    *dest*
     """
-    if os.path.exists(dest):
-        raise Exception, 'Folder already exists.'
-    elif not os.path.exists(dest):
+    if not os.path.exists(dest):
         os.makedirs(dest)
-        return dest
+    return dest
     
 ########################################################
 if __name__ == '__main__':
