@@ -59,7 +59,7 @@ class AE(object):
         self.dest = _check_dest(dest)
         open(dest + '/progress.log', 'a').close()
         logging.basicConfig(filename=dest + '/progress.log',
-                            filemode='w',
+                            filemode='a',
                             format='%(levelname)s %(asctime)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
 #         self.logger = logging.getLogger(__name__)
