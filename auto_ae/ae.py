@@ -62,7 +62,6 @@ class AE(object):
                             filemode='a',
                             format='%(levelname)s %(asctime)s: %(message)s',
                             datefmt='%m/%d/%Y %I:%M:%S %p', level=logging.DEBUG)
-#         self.logger = logging.getLogger(__name__)
         self.cxt = cxt
         self.go_on = go_on
         self.ce_finder = ce_finder # usage *ce_finder(implication, wait)* => (ce, imp)
@@ -257,7 +256,11 @@ class AE(object):
                 m += 'attributes before the start of this step\n'
             logging.info(m)
             basis = self.basis
-            (ce, imp_ce) = self.find_ces(basis, ce_wait)
+            ## functions' caches seem to cause leakage of memory, therefore empty them here
+            self.cxt.get_object_intent_by_index.__func__.cache = {}
+            self.cxt.get_attribute_extent_by_index.__func__.cache = {}
+            ##
+            (ce, _) = self.find_ces(basis, ce_wait)
             if not ce:
                 new_objects, new_attributes = self.advance(go_on_wait)
                 if not (new_objects or new_attributes):
