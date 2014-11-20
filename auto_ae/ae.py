@@ -256,10 +256,6 @@ class AE(object):
                 m += 'attributes before the start of this step\n'
             logging.info(m)
             basis = self.basis
-            ## functions' caches seem to cause leakage of memory, therefore empty them here
-            self.cxt.get_object_intent_by_index.__func__.cache = {}
-            self.cxt.get_attribute_extent_by_index.__func__.cache = {}
-            ##
             (ce, _) = self.find_ces(basis, ce_wait)
             if not ce:
                 new_objects, new_attributes = self.advance(go_on_wait)
