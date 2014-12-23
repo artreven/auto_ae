@@ -70,9 +70,6 @@ class AE(object):
         self.attributes_growing = attributes_growing
         self.step = 1
         
-    def _reset(self):
-        del self._basis
-        
     def _get_basis(self):
         try:
             if self._basis != None:
@@ -102,11 +99,9 @@ class AE(object):
         
     def add_row(self, row, object_name):
         self.cxt.add_object(row, object_name)
-        self._reset()
         
     def add_column(self, col, attr_name):
         self.cxt.add_attribute(col, attr_name)
-        self._reset()
         
     def add_object(self, object_name):
         row = [self.has_attribute(object_name, attr)
@@ -168,7 +163,7 @@ class AE(object):
         logging.info(m)
         return new_objects, new_attributes
     
-    def find_ces(self, imps, wait=float('inf')):
+    def find_ces(self, wait=float('inf')):
         """
         Try to find counter-examples for implications from *imps* and, if found,
         add them to the context. *ce_finder* takes implication and *wait* and
@@ -187,15 +182,15 @@ class AE(object):
         this is to allow speed up if *ce_finder* is able to process non-unit implications.
         @return: (implication, counter-example).
         """
-        s_imps = set(imps)
-        num_imps = len(s_imps)
+        #s_imps = set(imps)
+        #num_imps = len(s_imps)
         ts = time.time()
-        cnt = 0
+        imp_cnt = 0
         with open(self.dest + '/step{0}ces.txt'.format(self.step), 'a') as f:
             f.write('\tCurrent Context:\n' + str(self.cxt) + '\n'*5)
-            f.write('Total {0} (non-unit) implications.\n'.format(num_imps))
-        for imp in s_imps:
-            cnt += 1
+            #f.write('Total {0} (non-unit) implications.\n'.format(num_imps))
+        for imp in self.cxt.attribute_implications_iter():
+            imp_cnt += 1
             ts_ce = time.time() 
             (ce, reason) = self.ce_finder(imp, wait)
             te_ce = time.time()
@@ -221,8 +216,8 @@ class AE(object):
         # messages
         m = '\nCOUNTER-EXAMPLE FINDING PHASE, wait = {0}:\n'.format(wait)
         m += 'It took {0} seconds.\n'.format(te - ts)
-        m += 'Total {0} (non-unit) implications, '.format(num_imps)
-        m += 'processed {0} implications.\n'.format(cnt)
+        #m += 'Total {0} (non-unit) implications, '.format(num_imps)
+        m += 'Processed {0} implications.\n'.format(imp_cnt)
         if ce:
             m += '\tNew counter-example: '
             m += '{0} is a counter-example to {1}.\n'.format(ce, imp)
@@ -255,8 +250,7 @@ class AE(object):
                 m += 'There were {0} '.format(len(self.cxt.attributes))
                 m += 'attributes before the start of this step\n'
             logging.info(m)
-            basis = self.basis
-            (ce, _) = self.find_ces(basis, ce_wait)
+            (ce, _) = self.find_ces(ce_wait)
             if not ce:
                 new_objects, new_attributes = self.advance(go_on_wait)
                 if not (new_objects or new_attributes):

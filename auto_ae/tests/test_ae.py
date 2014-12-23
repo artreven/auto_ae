@@ -50,12 +50,10 @@ class Test:
     def tearDown(self):
         shutil.rmtree(self.ae.dest)
         
-    def test_basis_computation_and_reset(self):
+    def test_basis_computation(self):
         assert not hasattr(self.ae, '_basis')
         self.ae.basis
         assert self.ae._basis
-        self.ae._reset()
-        assert not hasattr(self.ae, '_basis')
         
     def test_run(self):
         self.ae.run(1, 1)
