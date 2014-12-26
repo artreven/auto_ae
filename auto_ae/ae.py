@@ -146,9 +146,9 @@ class AE(object):
         m += 'It took {0} seconds.\n'.format(te - ts)
         if new_objects or new_attributes:
             for new_obj in new_objects:
-                self.add_object(str(new_obj))
+                self.add_object(repr(new_obj))
             for new_attr in new_attributes:
-                self.add_attribute(str(new_attr))
+                self.add_attribute(repr(new_attr))
             self.step += 1
         else:
             m += 'No new entities.\n'
@@ -189,6 +189,7 @@ class AE(object):
         with open(self.dest + '/step{0}ces.txt'.format(self.step), 'a') as f:
             f.write('\tCurrent Context:\n' + str(self.cxt) + '\n'*5)
             #f.write('Total {0} (non-unit) implications.\n'.format(num_imps))
+        ce = None; imp = None
         for imp in self.cxt.attribute_implications_iter():
             imp_cnt += 1
             ts_ce = time.time() 
@@ -197,7 +198,7 @@ class AE(object):
             with open(self.dest + '/step{0}ces.txt'.format(self.step), 'a') as f:
                 m = str(imp) + '\n'
                 if ce:
-                    m += 'Found: ' + str(ce)
+                    m += 'Found: ' + repr(ce)
                 else:
                     m += reason
                 m += '\nTime taken:{0}\n\n'.format(te_ce - ts_ce)
@@ -220,10 +221,10 @@ class AE(object):
         m += 'Processed {0} implications.\n'.format(imp_cnt)
         if ce:
             m += '\tNew counter-example: '
-            m += '{0} is a counter-example to {1}.\n'.format(ce, imp)
+            m += '{0} is a counter-example to {1}.\n'.format(repr(ce), imp)
             m += '{0} objects left after reducing.\n'.format(len(self.cxt.objects))
             if self.attributes_growing and new_attribute:
-                m += 'New attribute {0} added.\n'.format(str(new_attribute))
+                m += 'New attribute {0} added.\n'.format(repr(new_attribute))
                 m += '{0} attributes left after reducing.\n'.format(len(self.cxt.attributes))
         else:
             m += 'No counter-examples found.\n'
