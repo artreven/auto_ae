@@ -43,6 +43,7 @@ class AE(object):
     '''
 
     def __init__(self, dest, cxt, has_attribute, ce_finder, go_on=None,
+                 till_1st_ce=True,
                  attributes_growing=False, get_new_attribute=lambda x: x):
         '''
         Constructor
@@ -69,6 +70,7 @@ class AE(object):
         self.get_new_attribute = get_new_attribute
         self.attributes_growing = attributes_growing
         self.step = 1
+        self.till_1st_ce = till_1st_ce 
         
     def _get_basis(self):
         try:
@@ -189,8 +191,12 @@ class AE(object):
         with open(self.dest + '/step{0}ces.txt'.format(self.step), 'a') as f:
             f.write('\tCurrent Context:\n' + str(self.cxt) + '\n'*5)
             #f.write('Total {0} (non-unit) implications.\n'.format(num_imps))
-        ce = None; imp = None
-        for imp in self.cxt.attribute_implications_iter():
+        ces_dict = dict(); ce = None; imp = None
+        if self.till_1st_ce:
+            basis = self.cxt.attribute_implications_iter()
+        else:
+            basis = self.basis
+        for imp in basis:
             imp_cnt += 1
             ts_ce = time.time() 
             (ce, reason) = self.ce_finder(imp, wait)
@@ -204,32 +210,37 @@ class AE(object):
                 m += '\nTime taken:{0}\n\n'.format(te_ce - ts_ce)
                 f.write(m)
             if ce:
-                self.add_object(repr(ce))
-                self.reduce_objects()
-                if self.attributes_growing:
-                    new_attribute = self.get_new_attribute(ce)
-                    if new_attribute:
-                        self.add_attribute(repr(new_attribute))
-                        self.reduce_attributes()
-                self.step += 1
-                break
+                ces_dict[repr(ce)] = imp
+                if self.till_1st_ce:
+                    break
         te = time.time()
+        for ce_repr in ces_dict.keys():
+            self.add_object(ce_repr)
+            if self.attributes_growing:
+                new_attribute = self.get_new_attribute(ce_repr)
+                if new_attribute:
+                    self.add_attribute(new_attribute)
+        self.reduce_objects()
+        self.reduce_attributes()
+        self.step += 1
         # messages
         m = '\nCOUNTER-EXAMPLE FINDING PHASE, wait = {0}:\n'.format(wait)
         m += 'It took {0} seconds.\n'.format(te - ts)
         #m += 'Total {0} (non-unit) implications, '.format(num_imps)
         m += 'Processed {0} implications.\n'.format(imp_cnt)
-        if ce:
+        for ce_repr, imp in ces_dict.items():
             m += '\tNew counter-example: '
             m += '{0} is a counter-example to {1}.\n'.format(repr(ce), imp)
-            m += '{0} objects left after reducing.\n'.format(len(self.cxt.objects))
             if self.attributes_growing and new_attribute:
                 m += 'New attribute {0} added.\n'.format(repr(new_attribute))
+        if ces_dict:
+            m += '{0} objects left after reducing.\n'.format(len(self.cxt.objects))
+            if self.attributes_growing and new_attribute:
                 m += '{0} attributes left after reducing.\n'.format(len(self.cxt.attributes))
         else:
             m += 'No counter-examples found.\n'
         logging.info(m)
-        return ce, imp
+        return ces_dict
     
     def run(self, ce_wait, go_on_wait=float('inf')):
         """
@@ -251,8 +262,8 @@ class AE(object):
                 m += 'There were {0} '.format(len(self.cxt.attributes))
                 m += 'attributes before the start of this step\n'
             logging.info(m)
-            (ce, _) = self.find_ces(ce_wait)
-            if not ce:
+            ces_dict = self.find_ces(ce_wait)
+            if not ces_dict:
                 new_objects, new_attributes = self.advance(go_on_wait)
                 if not (new_objects or new_attributes):
                     break
