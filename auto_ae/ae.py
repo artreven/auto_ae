@@ -101,9 +101,11 @@ class AE(object):
         
     def add_row(self, row, object_name):
         self.cxt.add_object(row, object_name)
+        self._basis = None
         
     def add_column(self, col, attr_name):
         self.cxt.add_attribute(col, attr_name)
+        self._basis = None
         
     def add_object(self, object_name):
         row = [self.has_attribute(object_name, attr)
@@ -230,7 +232,7 @@ class AE(object):
         m += 'Processed {0} implications.\n'.format(imp_cnt)
         for ce_repr, imp in ces_dict.items():
             m += '\tNew counter-example: '
-            m += '{0} is a counter-example to {1}.\n'.format(repr(ce), imp)
+            m += '{0} is a counter-example to {1}.\n'.format(ce_repr, imp)
             if self.attributes_growing and new_attribute:
                 m += 'New attribute {0} added.\n'.format(repr(new_attribute))
         if ces_dict:
